@@ -1,6 +1,18 @@
+import { Link } from 'react-router-dom';
+
 const Login = () => {
   return (
-    <div>Login</div>
+    <div className="login">
+      <h1>Title</h1>
+      <div className="form">
+        <input type="text" />
+        <input type="text" />
+      </div>
+
+      <Link to="/Courses">
+        <button>Submit</button>
+      </Link>
+    </div>
   )
 }
 

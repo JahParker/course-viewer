@@ -5,15 +5,80 @@
   text-align: center;
 }
 
+h1 {
+  font-size: 88px;
+  margin: 0;
+}
+
+h2 {
+  /* align-self: flex-start; */
+  margin: 0;
+}
+
+.section-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#section-h2 {
+  align-self: flex-start;
+}
+
+#section-button {
+  align-self: flex-end;
+}
+
+.section-header-top, .section-header-bottom {
+  display: flex;
+  justify-content: space-between;
+  width: 50vw;
+  align-self: flex-start;
+}
+
+.line-break {
+  width: 50vw;
+  height: 1px;
+  flex-shrink: 0;
+  background: rgba(128, 128, 128, 0.80);
+  margin-bottom: 4px;
+}
+
+
 /* Section: Pages */
-/* Course */
+/* Courses */
+.courses, .course-detail {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  max-width: 100%;
+  align-items: center;
+}
 
 
 /* Course Details */
 
 
 /* Login */
+.login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.form > input {
+  height: 24px;
+  width: 16vw;
+}
 
 
 /* Section: Components */
@@ -21,7 +86,34 @@
 
 
 /* Card */
+.card {
+  display: flex;
+  border-radius: 24px;
+  background: #C0BEBE;
+  margin: 8px 0;
+  color: black;
+  justify-content: space-around;
+  align-items: center;
+  width: 33vw;
+}
 
+.grade {
+  display: flex;
+
+}
 
 /* Header */
+.user-account {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  align-self: flex-end;
+  gap: 16px;
+  margin-right: 200px;
+}
+
+.signout {
+  width: 80px;
+  height: 24px;
+}
 

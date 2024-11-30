@@ -11,14 +11,14 @@ const Assignment = () => {
           <input type="text" name="assignment name" id="" />
 
           <h3>Category:</h3>
-          <div class="dropdown">
-            <button onClick={toggleDropdown} class="dropbtn">
+          <div className="dropdown">
+            <button onClick={null} className="dropbtn">
               Type
             </button>
-            <div id="dropdown-list" class="dropdown-content">
-              <p onClick={}>Link 1</p>
-              <p onClick={}>Link 2</p>
-              <p onClick={}>Link 3</p>
+            <div id="dropdown-list" className="dropdown-content">
+              <p onClick={null}>Link 1</p>
+              <p onClick={null}>Link 2</p>
+              <p onClick={null}>Link 3</p>
             </div>
           </div>
 
@@ -38,7 +38,7 @@ const Assignment = () => {
           <p>Type</p>
           <h3>Score:</h3>
           <p>--</p>
-          <img src="" alt="" onClick={}/>
+          <img src="" alt="" onClick={null}/>
         </>
       }
     </div>

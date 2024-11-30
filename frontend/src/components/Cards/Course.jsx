@@ -13,8 +13,7 @@ const Course = () => {
       }
 
       <div className="grade">
-        <p>Grade:</p>
-        <p>A</p>
+        <p>Grade: A</p>
       </div>
       
       {isEditing ? 
@@ -24,7 +23,7 @@ const Course = () => {
           <Button variant={"delete"} />
         </div>
       : 
-       <img src="" alt="" onClick={}/>
+       <img src="" alt="" onClick={null}/>
       }
     </div>
   )
