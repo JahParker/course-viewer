@@ -13,7 +13,7 @@ function App() {
       element: <Courses />
     },
     {
-      path:"/:CourseName", // Remember to add useParams
+      path:"/:courseName", // Remember to add useParams
       element: <CourseDetails /> 
     },
   ]);

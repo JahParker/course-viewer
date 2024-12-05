@@ -1,16 +1,16 @@
 import { Link } from "react-router-dom";
 
-const Header = () => {
+const Header = ({user}) => {
   return (
     <>
       <Link to="/Courses">
-        <h1>Title</h1>
+        <h1>Course Viewer</h1>
       </Link>
       <div className="user-account">
-        <p>Welcome, ---</p>
+        <p>Welcome, {user} </p>
         <Link to="/">
           <button className="signout">
-            {"(Sign out)"}
+            {"Sign out"}
           </button>
         </Link>
       </div>

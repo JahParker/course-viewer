@@ -1,4 +1,4 @@
-const Button = ({ variant }) => {
+const Button = ({ variant, onClick }) => {
   let color;
   let action;
   let content;
@@ -44,7 +44,7 @@ const Button = ({ variant }) => {
   }
 
   return (
-    <button className={`button-${color}`} onClick={action}>
+    <button className={`button-${color}`} onClick={onClick}>
       {content}
     </button>
   )

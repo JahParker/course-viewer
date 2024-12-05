@@ -1,7 +1,7 @@
 import { useState } from "react"
 import Button from "../Button";
 
-const Course = () => {
+const Course = ({ courseName, letterGrade }) => {
   let [isEditing, setIsEditing] = useState(false);
 
   return (
@@ -9,11 +9,11 @@ const Course = () => {
       {isEditing ? 
         <input type="text" name="course title" id="course title" /> 
       : 
-        <h3>Course Title</h3> 
+        <h3>{courseName}</h3> 
       }
 
       <div className="grade">
-        <p>Grade: A</p>
+        <p>Grade: {letterGrade}</p>
       </div>
       
       {isEditing ? 

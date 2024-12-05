@@ -1,7 +1,7 @@
 import { useState } from "react"
 import Button from "../Button";
 
-const Assignment = () => {
+const Assignment = ({name, type, score}) => {
   let [isEditing, setIsEditing] = useState(false);
 
   return (
@@ -13,7 +13,7 @@ const Assignment = () => {
           <h3>Category:</h3>
           <div className="dropdown">
             <button onClick={null} className="dropbtn">
-              Type
+              {type}
             </button>
             <div id="dropdown-list" className="dropdown-content">
               <p onClick={null}>Link 1</p>
@@ -33,11 +33,11 @@ const Assignment = () => {
         </>
       : 
         <>
-          <h3>Assignment Name</h3>
+          <h3>{name}</h3>
           <h3>Category:</h3>
-          <p>Type</p>
+          <p>{type}</p>
           <h3>Score:</h3>
-          <p>--</p>
+          <p>{score}</p>
           <img src="" alt="" onClick={null}/>
         </>
       }
