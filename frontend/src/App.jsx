@@ -13,7 +13,7 @@ function App() {
       element: <SignUp />
     },
     {
-      path:"/Login", // Remember to add useParams
+      path:"/Login", 
       element: <Login /> 
     },
     {

@@ -11,8 +11,17 @@ load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
+
 # Allows communication between our frontend and backend
-CORS(app, resources={r"/*": {"origins": "http://localhost:5174", "supports_credentials": True}})
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173", "supports_credentials": True}})
+
+@app.after_request
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:5173'
+    response.headers['Access-Control-Allow-Credentials'] = 'true'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS, PUT, DELETE'
+    return response
 
 # Create MySQL connection (What we've done in class)
 def get_db_connection():
@@ -118,45 +127,26 @@ def get_courses():
     cursor = connection.cursor(dictionary=True)
 
     try:
-        # Joins the tables that show the courses associated with a particular student and calculate the letter grade
+        # Retrieve the student's name and courses they are enrolled in
         cursor.execute(
             '''
             SELECT 
-            c.id AS course_id,
-            c.name AS course_name,
-            s.firstname AS first_name,
-            lg.letter_grade
-            FROM (
-                SELECT 
-                    c.id AS course_id,
-                    SUM(sa.grade * (cat.weight / 100)) / SUM(cat.weight / 100) AS total_weighted_average
-                FROM course c
-                JOIN courseassignment ca ON c.id = ca.course_id_fk
-                JOIN category cat ON ca.category_id_fk = cat.id
-                JOIN studentassignment sa ON ca.id = sa.course_assignment_id_fk
-                JOIN studentenrollment se ON c.id = se.course_id_fk
-                WHERE se.student_id_fk = %s
-                GROUP BY 
-                    c.id
-            ) AS category_avg
-            JOIN course c ON category_avg.course_id = c.id
-            JOIN student s ON s.id = %s
-            JOIN lettergradescale lg ON category_avg.total_weighted_average >= lg.min_score
-            WHERE 
-                lg.min_score = (
-                    SELECT MAX(min_score) 
-                    FROM lettergradescale
-                    WHERE min_score <= category_avg.total_weighted_average
-                )
-            ORDER BY course_id;
-            ''', (student_id, student_id)
+                c.id AS course_id,
+                c.name AS course_name,
+                s.firstname AS first_name,
+                s.lastname AS last_name
+            FROM course c
+            JOIN studentenrollment se ON c.id = se.course_id_fk
+            JOIN student s ON s.id = se.student_id_fk
+            WHERE se.student_id_fk = %s
+            ORDER BY c.id;
+            ''', (student_id,)
         )
 
         courses = cursor.fetchall()
         print(f"Fetched courses: {courses}")
         
         if courses:
-            # Return the data in the required format for React
             return jsonify(courses), 200
         else:
             return jsonify({"message": "No courses found"}), 404
@@ -169,13 +159,13 @@ def get_courses():
         connection.close()
 
 
+
 @app.route('/api/courses/add', methods=['POST'])
 def add_course():
     # Enrolls student in course
     data = request.json
-    print('Data: ', data)
     student_id = session.get('student_id')
-    course_name = data.get("course_name")
+    course_name = data.get("courseName")
     
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
@@ -289,7 +279,7 @@ def get_assignments(course_name):
     )
     
     assignments = cursor.fetchall()
-    
+    print(f"Fetched assignments: {assignments}")
     cursor.close()
     connection.close()
     return jsonify(assignments)

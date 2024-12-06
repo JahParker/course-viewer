@@ -44,6 +44,16 @@ h2 {
   margin-bottom: 4px;
 }
 
+.card-list-row {
+  display: flex;
+  gap: 8px;
+}
+
+.delete {
+  color: red;
+  font-size: large;
+  align-self: center;
+}
 
 /* Section: Pages */
 /* Courses */
@@ -101,7 +111,7 @@ h2 {
   background: #C0BEBE;
   margin: 8px 0;
   color: black;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
   width: 33vw;
 }

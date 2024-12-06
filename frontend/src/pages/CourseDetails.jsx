@@ -8,6 +8,11 @@ import { useState, useEffect } from "react"
 const CourseDetails = () => {
   const {courseName} = useParams();
   const [assignments, setAssignments] = useState(null); // Default to null
+  const [isAdding, setIsAdding] = useState(false)
+  const [assignmentName, setAssignmentName] = useState(''); 
+  const [category, setCategory] = useState(''); 
+  const [score, setScore] = useState(0.0); 
+  
 
   const fetchData = async () => {
     try {
@@ -33,7 +38,7 @@ const CourseDetails = () => {
     fetchData();
   }, []);
 
-  const addAssignments = async () => {
+  const handleAddAssignment = async () => {
     try {
       // Make the API request
       const response = await fetch('/api/courses/Math224%20Intro%20Probability%20and%20Statistics/assignments/add', {
@@ -42,9 +47,9 @@ const CourseDetails = () => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          assignment_name: "Homework 1",
-          category_id: 1,
-          score: 90
+          assignment_name: assignmentName,
+          category_id: category,
+          score: parseFloat(score).toFixed(2)
         })
       });
   
@@ -62,12 +67,24 @@ const CourseDetails = () => {
     } catch (error) {
       console.error('Error:', error);
     }
+
+    setIsAdding(false)
+    setAssignmentName('')
+    setCategory('')
+    setScore('')
   }
   
+  const addButton = () => {
+    setIsAdding(true);
+  };
 
   return (
     <div className="course-detail">
-      {assignments && <Header user={assignments[0].student_name}/>}
+      {assignments && assignments.length > 0 ? 
+        <Header user={assignments[0].first_name} />
+      : 
+        <Header user="--" />
+      }
         <div className="section-header">
           <div className="section-header-top">
             <h2>{courseName}</h2>
@@ -78,8 +95,31 @@ const CourseDetails = () => {
             <button>
               Edit Assignment Categories
             </button>
-            <Button variant="add" onClick={addAssignments} />
+            <Button variant="add" onClick={addButton} />
         </div>
+        {isAdding && 
+          <div className="input">
+            <input
+              type="text"
+              placeholder="Enter Assignment Name"
+              value={assignmentName}
+              onChange={(e) => setAssignmentName(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Enter Category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Enter Score"
+              value={score}
+              onChange={(e) => setScore(e.target.value)}
+            />
+            <button onClick={handleAddAssignment}>Submit</button>
+          </div> 
+        }
       </div>
       <div className="card-list">
         {assignments && assignments.map((assignment, index) => (
