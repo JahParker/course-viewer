@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom"; // Add useHistory for redirection
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react"; // Import useState for managing user state
 
 const Header = ({ user }) => {

@@ -174,7 +174,7 @@ def add_course():
     # Enrolls student in course
     data = request.json
     print('Data: ', data)
-    student_id = user_id
+    student_id = session.get('student_id')
     course_name = data.get("course_name")
     
     connection = get_db_connection()
@@ -308,7 +308,7 @@ def add_assignment(course_name):
 
     try:
         # Establish database connection
-        student_id = user_id
+        student_id = session.get('student_id')
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
 

@@ -1,12 +1,20 @@
 import './App.css';
 import {useRoutes} from 'react-router-dom';
-import {Login, Courses, CourseDetails} from './pages';
+import {Login, Courses, CourseDetails, Welcome, SignUp } from './pages';
 
 function App() {
   let pageRoutes = useRoutes([
     {
       path: "/",
-      element:<Login />
+      element:<Welcome />
+    },
+    {
+      path:"/Signup",
+      element: <SignUp />
+    },
+    {
+      path:"/Login", // Remember to add useParams
+      element: <Login /> 
     },
     {
       path:"/Courses",

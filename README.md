@@ -56,6 +56,23 @@ SECRET_KEY=your-random-key
 flask run
 ```
 
+## TODO
+
+- [ ] Add registration - R
+- [ ] Adding course - J
+- [ ] Deleting course - J
+- [ ] Adding assignment
+- [ ] Deleting assignment
+- [ ] Assignment category feature (Add, Drop, Edit)
+- [ ] Grade scale feature feature (Add, Drop, Edit)
+- Bonus
+- [ ] Editing courses
+- [ ] Editing assignments
+- [ ] Ensuring weights add up to 100% minimum
+- [ ] Be able to explain what we would have done for professor role
+
+
+
 ## Thoughts
 
 Maybe a help button is called for. Just so users know how to use the app properly since the grade scale

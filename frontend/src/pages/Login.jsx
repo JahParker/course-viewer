@@ -6,7 +6,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = async () => {
+  const handleLogin = async () => {
     try {
       const response = await fetch("http://localhost:8000/api/login", {
         method: "POST",
@@ -34,8 +34,8 @@ const Login = () => {
 
   return (
     <div className="login">
-      <h1>Course Viewer</h1>
-      <div className="form">
+      <h1>Login</h1>
+      <div className="credentials">
         <input
           type="text"
           placeholder="Username"
@@ -48,9 +48,9 @@ const Login = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-      </div>
-      <button onClick={handleSubmit}>Submit</button>
+        <button onClick={handleLogin}>Sign in</button>
     </div>
+  </div>
   );
 };
 

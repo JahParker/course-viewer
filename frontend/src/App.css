@@ -61,7 +61,7 @@ h2 {
 
 
 /* Login */
-.login {
+.credentials {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -78,6 +78,15 @@ h2 {
 .form > input {
   height: 24px;
   width: 16vw;
+}
+
+.button-container, .radio {
+  display: flex;
+  justify-content: center;
+}
+
+.button-container {
+  gap: 16px;
 }
 
 
