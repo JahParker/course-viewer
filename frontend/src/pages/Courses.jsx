@@ -7,23 +7,33 @@ import { useState, useEffect } from "react"
 const Courses = () => {
   // Method to get data from API goes here
   const [courses, setCourses] = useState(null); // Default to null
+  const [isDataFetched, setIsDataFetched] = useState(false);
 
   const fetchData = async () => {
       try {
-          const response = await fetch('http://localhost:8000/api/courses/get');
-          const data = await response.json();
-          
-          // Ensure that the data is not null or empty before setting state
-          if (data && data.length > 0) {
-              setCourses(data);
-          } else {
-              setCourses([]); // If no data, set an empty array
-          }
-          console.log(data);
-      } catch (error) {
-          console.error('Error fetching data:', error);
-          setCourses([]); // Handle error by setting an empty array
-      }
+        setIsDataFetched(false)
+        const response = await fetch('http://localhost:8000/api/courses/get', {
+          method: 'GET',
+          credentials: 'include', // or 'include' for cross-origin requests
+      });
+        const data = await response.json();
+        
+        // Ensure that the data is not null or empty before setting state
+        if (data && data.length > 0) {
+            setCourses(data);
+
+        } else {
+            setCourses([]); // If no data, set an empty array
+        }
+        setIsDataFetched(true)
+        // console.log(data);
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        setCourses([]); // Handle error by setting an empty array
+    }
+
+    console.log(courses);
+    
   }
 
   useEffect(() => {
@@ -56,7 +66,7 @@ const Courses = () => {
 
   return (
     <div className="courses">
-      {courses && <Header user={courses[0].first_name} />}
+      {isDataFetched && <Header user={courses[0].first_name} />}
       <div className="section-header">
         <div className="section-header-top">
           <h2 id="section-h2">Courses</h2>
@@ -67,7 +77,6 @@ const Courses = () => {
         </div>
       </div>
       <div className="card-list">
-          {console.log(courses)}
           {courses && courses.map((course, index) => (
             <Link key={index} to={`/${course.course_name}`}>
               <Course courseName={course.course_name} letterGrade={course.letter_grade}/>

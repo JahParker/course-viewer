@@ -11,7 +11,10 @@ const CourseDetails = () => {
 
   const fetchData = async () => {
     try {
-        const response = await fetch(`/api/${courseName}/assignments/get`);
+      const response = await fetch(`/api/${courseName}/assignments/get`, {
+        method: 'GET',
+        credentials: 'include', // or 'include' for cross-origin requests
+    });
         const data = await response.json();
         
         // Ensure that the data is not null or empty before setting state

@@ -1,3 +1,4 @@
+import time
 from flask import Flask, jsonify, session, request # Python web framework and Python to JSON
 from flask_cors import CORS # Explained below
 from dotenv import load_dotenv # Reads .env file
@@ -7,10 +8,11 @@ from urllib.parse import unquote
 
 load_dotenv()
 
+
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
 # Allows communication between our frontend and backend
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "http://localhost:5174", "supports_credentials": True}})
 
 # Create MySQL connection (What we've done in class)
 def get_db_connection():
@@ -22,15 +24,47 @@ def get_db_connection():
         database=os.getenv('MYSQL_DB') 
     )
 
-# Authentication
-@app.route('/api/login', methods=['POST'])
-def login():
+# Authentication (TODO: Add ability to detect role of user)
+@app.route('/api/register', methods=['POST'])
+def register():
+    # Takes the data from the request and stores them in variables
     data = request.json
     username = data.get("username")
     password = data.get("password")
+    role = data.get("role")
 
-    if not username or not password:
-        return jsonify({"error": "Username and password are required"}), 400
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    try:
+        # Checks if auth id and student auth id match
+        cursor.execute(
+            '''
+            
+            ''', (username, password, role)
+        )
+        student = cursor.fetchone()
+
+        # Store the student ID in the session
+        # session['id'] = student['student_id']
+        # print(session['id'])
+        
+        return jsonify({"message": "Login successful", "student_id": student['student_id']}), 200
+    
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        connection.close()
+
+
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    # Takes the data from the request and stores them in variables
+    data = request.json
+    username = data.get("username")
+    password = data.get("password")
 
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
@@ -43,87 +77,104 @@ def login():
             FROM authentication
             JOIN student ON authentication.id = student.authentication_id_fk
             WHERE authentication.username = %s AND authentication.password = %s
-            ''', (username, password)
+            ''', (username, password,)
         )
         student = cursor.fetchone()
-
-        if not student:
-            return jsonify({"error": "Student record not found"}), 404
-
-        # Store the student ID in the session
-        session['id'] = student['student_id']
-        return jsonify({"message": "Login successful", "student_id": student['student_id']}), 200
+        print(student)
+        
+        # Check if the query returned a result
+        if student:
+            # Store the student ID in the session
+            session["student_id"] = student['student_id']
+            return jsonify({"message": "Login successful", "student_id": student['student_id']}), 200
+        else:
+            return jsonify({"message": "Invalid credentials"}), 401
+    
     except Exception as e:
-        return jsonify({"error": f"Database error: {str(e)}"}), 500
+        return jsonify({"error": "Database error: " + str(e)}), 500
     finally:
         cursor.close()
         connection.close()
 
-@app.route('/api/logout')
-def logout(): 
-    session.pop('student_id', None) 
+
+@app.route('/api/logout', methods=['POST'])
+def logout():
+    session.clear()  # Clears session data
+    print(dict(session))
     return jsonify({"message": "SUCCESS"})
 
 
-@app.route('/')
-
 # Courses
-@app.route('/api/courses/get')
+@app.route('/api/courses/get', methods=['GET'])
 def get_courses(): 
-    # View all enrolled courses
+    # Ensure that the student_id is retrieved from the session
+    student_id = session.get('student_id')
+    print('Id of student: ', student_id)
+    
+    if not student_id:
+        return jsonify({"error": "User not logged in"}), 401
+    
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
-    student_id = 1
-    print(student_id)
-    
-    # Joins the tables that show the courses associated with a particular student and calculate the letter grade
-    # Whichever courses being use to get the letter grade is the same information needed to show the course info
-    cursor.execute(
-        '''
-        SELECT 
-        c.id AS course_id,
-        c.name AS course_name,
-        s.firstname AS first_name,
-        lg.letter_grade
-        FROM (
-        SELECT 
-            c.id AS course_id,
-            SUM(sa.grade * (cat.weight / 100)) / SUM(cat.weight / 100) AS total_weighted_average
-        FROM course c
-        JOIN courseassignment ca ON c.id = ca.course_id_fk
-        JOIN category cat ON ca.category_id_fk = cat.id
-        JOIN studentassignment sa ON ca.id = sa.course_assignment_id_fk
-        JOIN studentenrollment se ON c.id = se.course_id_fk
-        WHERE se.student_id_fk = 1  
-        GROUP BY 
-            c.id
-    ) AS category_avg
-    JOIN course c ON category_avg.course_id = c.id
-    JOIN student s ON s.id = %s 
-    JOIN lettergradescale lg ON category_avg.total_weighted_average >= lg.min_score
-WHERE 
-    lg.min_score = (
-        SELECT MAX(min_score) 
-        FROM lettergradescale
-        WHERE min_score <= category_avg.total_weighted_average
-    )
-ORDER BY course_id;
 
-        ''', (student_id,)
-    )
-    # category_avg.total_weighted_average,
-    courses = cursor.fetchall()
+    try:
+        # Joins the tables that show the courses associated with a particular student and calculate the letter grade
+        cursor.execute(
+            '''
+            SELECT 
+            c.id AS course_id,
+            c.name AS course_name,
+            s.firstname AS first_name,
+            lg.letter_grade
+            FROM (
+                SELECT 
+                    c.id AS course_id,
+                    SUM(sa.grade * (cat.weight / 100)) / SUM(cat.weight / 100) AS total_weighted_average
+                FROM course c
+                JOIN courseassignment ca ON c.id = ca.course_id_fk
+                JOIN category cat ON ca.category_id_fk = cat.id
+                JOIN studentassignment sa ON ca.id = sa.course_assignment_id_fk
+                JOIN studentenrollment se ON c.id = se.course_id_fk
+                WHERE se.student_id_fk = %s
+                GROUP BY 
+                    c.id
+            ) AS category_avg
+            JOIN course c ON category_avg.course_id = c.id
+            JOIN student s ON s.id = %s
+            JOIN lettergradescale lg ON category_avg.total_weighted_average >= lg.min_score
+            WHERE 
+                lg.min_score = (
+                    SELECT MAX(min_score) 
+                    FROM lettergradescale
+                    WHERE min_score <= category_avg.total_weighted_average
+                )
+            ORDER BY course_id;
+            ''', (student_id, student_id)
+        )
+
+        courses = cursor.fetchall()
+        print(f"Fetched courses: {courses}")
+        
+        if courses:
+            # Return the data in the required format for React
+            return jsonify(courses), 200
+        else:
+            return jsonify({"message": "No courses found"}), 404
+
+    except Exception as e:
+        return jsonify({"error": "Database error: " + str(e)}), 500
     
-    cursor.close()
-    connection.close()
-    return jsonify(courses)
+    finally:
+        cursor.close()
+        connection.close()
+
 
 @app.route('/api/courses/add', methods=['POST'])
 def add_course():
     # Enrolls student in course
     data = request.json
     print('Data: ', data)
-    student_id = 1
+    student_id = user_id
     course_name = data.get("course_name")
     
     connection = get_db_connection()
@@ -208,15 +259,15 @@ def get_grade_scale(course_id):
 
 
 # Assignments
-@app.route('/api/<course_name>/assignments/get')
+@app.route('/api/<course_name>/assignments/get', methods=['GET'])
 def get_assignments(course_name):
     # View all assignments assigned to a student in a course
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
+    student_id = session.get('student_id')
     
     clean_course_name = unquote(course_name).strip()
     
-    student_id = 1
     # Grabs the assignment linked in a course, the category, and student information
     cursor.execute(
         '''
@@ -257,7 +308,7 @@ def add_assignment(course_name):
 
     try:
         # Establish database connection
-        student_id = session.get('student_id')
+        student_id = user_id
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
 
@@ -283,7 +334,7 @@ def add_assignment(course_name):
 
         assignment_id = cursor.lastrowid
 
-        # Insert into studentassignment table (assigning to student with ID 1 for now)
+        # Insert into studentassignment table
         cursor.execute(
             '''
             INSERT INTO studentassignment (student_id_fk, course_assignment_id_fk)
